@@ -1,1 +1,1 @@
-# xintern-reviews-api
+# xintern-companies-api
