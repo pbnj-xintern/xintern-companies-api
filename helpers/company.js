@@ -4,6 +4,7 @@ const AwsUtil = require('@pbnj-xintern/xintern-commons/util/aws')
 const db = require('@pbnj-xintern/xintern-commons/util/db')
 const Status = require('@pbnj-xintern/xintern-commons/util/status')
 const MONGO_URL = process.env.MONGO_URL
+const mongoose = require('mongoose')
 
 const getExtension = base64 => {
     if (base64.includes('image/jpg') || base64.includes('image/jpeg'))
