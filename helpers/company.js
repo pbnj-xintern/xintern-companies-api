@@ -162,8 +162,8 @@ module.exports.getAllCompanies = async () => {
                 }
             }
         ])
-        .collation({'locale':'en_US', numericOrdering: true} )
-        .sort({_id: 'asc'})
+            .collation({ 'locale': 'en_US', numericOrdering: true })
+            .sort({ _id: 'asc' })
     ).catch(e => {
         console.error(e.message || e)
         return false
@@ -175,19 +175,19 @@ module.exports.getAllCompanies = async () => {
     return Status.createSuccessResponse(200, result, "Successfully fetched companies.")
 }
 
-module.exports.getCompanyLocations = async companyName => {	
-    try {	
-        let companyList = await db.exec(MONGO_URL, () => {	
-            return Company.find({ name: companyName })	
-        })	
-        if (companyList.length === 0) return Status.createErrorResponse(404, "No companies found.")	
-        console.log('companyList:', companyList)	
-        let companyLocations = companyList.map(company => company.location)	
-        console.log('companyLocations:', companyLocations)	
-        return Status.createSuccessResponse(200, companyLocations)	
-    } catch (err) {	
-        console.error(err.message)	
-    }	
+module.exports.getCompanyLocations = async companyName => {
+    try {
+        let companyList = await db.exec(MONGO_URL, () => {
+            return Company.find({ name: companyName })
+        })
+        if (companyList.length === 0) return Status.createErrorResponse(404, "No companies found.")
+        console.log('companyList:', companyList)
+        let companyLocations = companyList.map(company => company.location)
+        console.log('companyLocations:', companyLocations)
+        return Status.createSuccessResponse(200, companyLocations)
+    } catch (err) {
+        console.error(err.message)
+    }
 }
 
 module.exports.addCompany = async (payload) => {
@@ -233,6 +233,29 @@ module.exports.updateCompany = async (companyId, payload) => {
         console.error('company does not exist:\n', err.message)
         return Status.createErrorResponse(400, err.message)
     }
+}
+
+module.exports.getGroupedCompaniesByName = async companyName => {
+    let result = await db.exec(MONGO_URL,
+        () => Company.aggregate([
+            { $match: { name: new RegExp(companyName.toLowerCase(), 'i') } },
+            {
+                $group: {
+                    _id: '$name',
+                    name: { $first: '$name' },
+                    logo: { $first: '$logo' }
+                }
+            }
+        ]).limit(10)
+    ).catch(e => {
+        console.error(e.message || e)
+        return false
+    })
+
+    if (!result)
+        return Status.createErrorResponse(500, 'Could not aggregate companies')
+
+    return Status.createSuccessResponse(200, result, "Successfully fetched companies.")
 }
 
 module.exports.findCompanyByName = findCompanyByName;

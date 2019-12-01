@@ -2,6 +2,7 @@
 const CompanyHelper = require('./helpers/company')
 const TOKEN_SECRET = process.env.TOKEN_SECRET
 const AuthHelper = require('@pbnj-xintern/xintern-commons/util/auth_checker')
+const Status = require('@pbnj-xintern/xintern-commons/util/status')
 const middy = require('middy')
 
 //--------------- LAMBDA FUNCTIONS ---------------
@@ -30,4 +31,15 @@ module.exports.getAllCompanies = async () => {
 
 module.exports.getCompanyLocations = async (event) => {
 	return await CompanyHelper.getCompanyLocations(event.queryStringParameters.company_name)
+}
+
+module.exports.getGroupedCompaniesByName = async event => {
+	let companyName = event.pathParameters.company_name
+
+	if(!companyName)
+		return Status.createErrorResponse(400, 'Company name not supplied')
+
+	companyName = companyName.split('%20').join(' ')
+
+	return await CompanyHelper.getGroupedCompaniesByName(companyName)
 }
