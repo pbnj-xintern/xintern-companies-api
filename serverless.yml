@@ -87,6 +87,18 @@ functions:
           path: locations
           method: GET
           cors: true
+  getGroupedCompaniesByName:
+    handler: company-handler.getGroupedCompaniesByName
+    events:
+      - http:
+          path: /grouped/{company_name}
+          method: GET
+          request:
+            parameters:
+              paths:
+                company_name: true
+          cors: true
+
 # ==================================
 # END COMPANY FUNCTIONS
 # ==================================
