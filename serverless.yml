@@ -15,9 +15,17 @@ package:
   exclude:
     - tokens.yml
 
+plugins:
+  - serverless-domain-manager
+
 custom:
   stage: ${opt:stage, self:provider.stage}
   tokens: ${file(tokens.yml):${self:custom.stage}}
+  customDomain: 
+    domainName: 'api.xintern.co'
+    basePath: 'company'
+    stage: ${self:provider.stage}
+    createRoute53Record: true
 
 functions:
 # ==================================
@@ -27,7 +35,7 @@ functions:
     handler: company-handler.addCompany
     events:
       - http:
-          path: company
+          path: /
           method: POST
           cors: true
 
@@ -35,7 +43,7 @@ functions:
     handler: company-handler.deleteCompany
     events:
       - http:
-          path: company/{company_id}
+          path: /{company_id}
           method: DELETE
           request:
             parameters:
@@ -47,7 +55,7 @@ functions:
     handler: company-handler.updateCompany
     events:
       - http:
-          path: review/{review_id}/company/{company_id}
+          path: /{company_id}
           method: PATCH
           request:
             parameters:
@@ -60,7 +68,7 @@ functions:
     handler: company-handler.getTopCompanies
     events:
       - http:
-          path: companies/top
+          path: top
           method: GET
           cors: true
 
@@ -68,7 +76,7 @@ functions:
     handler: company-handler.getAllCompanies
     events:
       - http:
-          path: company/all
+          path: all
           method: GET
           cors: true
 # ==================================
