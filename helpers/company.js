@@ -175,6 +175,21 @@ module.exports.getAllCompanies = async () => {
     return Status.createSuccessResponse(200, result, "Successfully fetched companies.")
 }
 
+module.exports.getCompanyLocations = async companyName => {	
+    try {	
+        let companyList = await db.exec(MONGO_URL, () => {	
+            return Company.find({ name: companyName })	
+        })	
+        if (companyList.length === 0) return Status.createErrorResponse(404, "No companies found.")	
+        console.log('companyList:', companyList)	
+        let companyLocations = companyList.map(company => company.location)	
+        console.log('companyLocations:', companyLocations)	
+        return Status.createSuccessResponse(200, companyLocations)	
+    } catch (err) {	
+        console.error(err.message)	
+    }	
+}
+
 module.exports.addCompany = async (payload) => {
     let newCompany = new Company({
         _id: new mongoose.Types.ObjectId(),
