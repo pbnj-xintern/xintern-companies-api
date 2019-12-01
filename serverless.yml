@@ -79,6 +79,14 @@ functions:
           path: all
           method: GET
           cors: true
+
+  getCompanyLocations:
+    handler: company-handler.getCompanyLocations
+    events:
+      - http:
+          path: locations
+          method: GET
+          cors: true
 # ==================================
 # END COMPANY FUNCTIONS
 # ==================================
