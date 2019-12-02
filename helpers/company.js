@@ -156,7 +156,7 @@ module.exports.getAllCompanies = async () => {
             { $match: {} },
             {
                 $group: {
-                    _id: '$name',
+                    _id: { $toLower: '$name' },
                     name: { $first: '$name' },
                     logo: { $first: '$logo' }
                 }
@@ -241,7 +241,7 @@ module.exports.getGroupedCompaniesByName = async companyName => {
             { $match: { name: new RegExp(companyName.toLowerCase(), 'i') } },
             {
                 $group: {
-                    _id: '$name',
+                    _id: { $toLower: '$name' },
                     name: { $first: '$name' },
                     logo: { $first: '$logo' }
                 }
