@@ -36,10 +36,17 @@ module.exports.getCompanyLocations = async (event) => {
 module.exports.getGroupedCompaniesByName = async event => {
 	let companyName = event.pathParameters.company_name
 
-	if(!companyName)
+	if (!companyName)
 		return Status.createErrorResponse(400, 'Company name not supplied')
 
 	companyName = companyName.split('%20').join(' ')
 
 	return await CompanyHelper.getGroupedCompaniesByName(companyName)
+}
+
+module.exports.getCompanies = async (event) => {
+	if (!event.pathParameters.location)
+		return Status.createErrorResponse(400, 'Location not supplied')
+
+	return await CompanyHelper.getCompanies(null, null, event.pathParameters.location)
 }

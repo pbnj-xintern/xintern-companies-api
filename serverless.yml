@@ -98,6 +98,14 @@ functions:
               paths:
                 company_name: true
           cors: true
+  getCompanies:
+    handler: company-handler.getCompanies
+    events:
+      - http:
+          path: /
+          method: GET
+          request:
+          cors: true
 
 # ==================================
 # END COMPANY FUNCTIONS

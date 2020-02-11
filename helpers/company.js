@@ -48,6 +48,21 @@ const findCompanyById = async (companyId) => {
     }
 }
 
+
+const getCompaniesByLocation = async location => {
+    if (!location)
+        return null
+
+    return await db.exec(MONGO_URL, () =>
+        Company.find(
+            { location: { "$regex": location, "$options": "i" } },
+        )
+    ).catch(e => {
+        console.error(e.message || e)
+        return null
+    })
+}
+
 module.exports.updateCompanyPicture = async (companyObj, base64) => {
 
     let extension = getExtension(base64)
@@ -68,16 +83,6 @@ module.exports.updateCompanyPicture = async (companyObj, base64) => {
         () => Company.findOneAndUpdate({ _id: companyObj._id }, { logo: url }).then(company => {
             return Status.createSuccessResponse(200, company)
         }).catch(err => {
-            console.log(err)
-            return Status.createErrorResponse(500, 'Error while finding company')
-        })
-    )
-}
-
-module.exports.getCompanyById = async id => {
-    return db.exec(
-        MONGO_URL,
-        () => Company.findById(id).catch(err => {
             console.log(err)
             return Status.createErrorResponse(500, 'Error while finding company')
         })
@@ -254,6 +259,35 @@ module.exports.getGroupedCompaniesByName = async companyName => {
 
     if (!result)
         return Status.createErrorResponse(500, 'Could not aggregate companies')
+
+    return Status.createSuccessResponse(200, result, "Successfully fetched companies.")
+}
+
+module.exports.getCompanies = async (id, name, location) => {
+
+    if (id)
+        return db.exec(
+            MONGO_URL,
+            () => Company.findById(id).catch(err => {
+                console.log(err)
+                return Status.createErrorResponse(500, 'Error while finding company')
+            })
+        )
+
+    let whereQuery = {}
+
+    if (name) whereQuery.name = { "$regex": name, "$options": "i" }
+    if (location) whereQuery.location = { "$regex": location, "$options": "i" }
+    if (Object.keys(whereQuery).length < 1) return Status.createErrorResponse(500, 'Insufficient parameters supplied')
+
+    let result = await db.exec(MONGO_URL, () => Company.find(whereQuery))
+        .catch(e => {
+            console.error(e.message || e)
+            return false
+        })
+
+    if (!result)
+        return Status.createErrorResponse(500, 'Could not find companies')
 
     return Status.createSuccessResponse(200, result, "Successfully fetched companies.")
 }
